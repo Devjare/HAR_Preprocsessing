@@ -19,9 +19,7 @@ from methods import *
 
 """Change "filepath" to where the csv file is stored on personal google drive."""
 
-# TODO: CONVERITR TIMESTAMPS A FORMATO DE FECHA(DATETIME COMPLETO)
-
-path = "./dataset/reduced.csv"
+path = "./dataset/reduced_unnamed.csv"
 dataset = pd.read_csv(path)
 times = dataset["Arrival_Time"]
 

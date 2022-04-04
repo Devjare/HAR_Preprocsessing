@@ -12,7 +12,9 @@ def remove_gravity(data):
   gravity = [0, 0, 0]
   accNoGravity = [[], [], []]
 
-  for idx in data["Index"]:
+  for idx in data["Idx"]:
+    # print("Data[Index]: \n", data["Index"])
+    # print("idx: ", idx)
     x = data[data["Index"] == idx]['x'][idx]
     y = data[data["Index"] == idx]['y'][idx]
     z = data[data["Index"] == idx]['z'][idx]
@@ -40,6 +42,9 @@ def segment_data(segment_size, data):
   for i in range(0, len(data), segment_size):
     segment_init = i
     segment = data.iloc[i:i+segment_size]
+    # unique_classes = segment["gt"].unique()
+    # Get the most freuent class, and select it as the segment class.
+    most_freq_class = segment["gt"].value_counts().idxmax()
     segments[segment_number] = {
             'init': segment_init,
             'size': len(segment),
