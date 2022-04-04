@@ -1,2 +1,3 @@
 dataset/*
 !dataset/reduced.csv
+!dataset/reduced_unnamed.csv
