@@ -2,6 +2,8 @@ import math
 import numpy as np
 import pandas as pd
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 def remove_gravity(data):
   # TODO: HOW GRAVITY EXTRACTION WORKS.
   # IF IT STARTS IN 0, what's
@@ -10,10 +12,10 @@ def remove_gravity(data):
   gravity = [0, 0, 0]
   accNoGravity = [[], [], []]
 
-  for i in range(len(data)):
-    x = data['x'][i]
-    y = data['y'][i]
-    z = data['z'][i]
+  for idx in data["Index"]:
+    x = data[data["Index"] == idx]['x'][idx]
+    y = data[data["Index"] == idx]['y'][idx]
+    z = data[data["Index"] == idx]['z'][idx]
 
     gravity[0] = alpha * gravity[0] + (1 - alpha) * x
     gravity[1] = alpha * gravity[1] + (1 - alpha) * y
@@ -41,7 +43,8 @@ def segment_data(segment_size, data):
     segments[segment_number] = {
             'init': segment_init,
             'size': len(segment),
-            'data': segment
+            'data': segment,
+            'class': segment["gt"].unique()
         }
 
     # Preprocess segment(Extract features)

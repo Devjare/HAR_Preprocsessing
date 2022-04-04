@@ -28,17 +28,25 @@ times = dataset["Arrival_Time"]
 dataset = dataset.drop(["Creation_Time", "Arrival_Time"], axis=1)
 # Interarrivals are in the range 9-11 millliseconds.
 
-dataset_sampled = dataset
+S_DS = dataset
 
-# dataset_sampled = dataset.head(len(dataset)/3)
+# S_DS = dataset.head(len(dataset)/3)
 # Convert timestamp to date.
 for i in range(len(times)):
     times[i] = datetime.fromtimestamp(times[i]/1e9, tz=timezone.utc)
 
-dataset_sampled["Realtime"] = times
+S_DS["Realtime"] = times
+
+# Remove nan values on classes.
+# df.drop(df[df.score < 50].index, inplace=True)
+print("Null class row: ")
+print(S_DS[S_DS["Index"] == 118469])
+nanrows = S_DS[S_DS["gt"].isna()]
+print("NAN DATA: \n", nanrows)
+S_DS = S_DS.drop(nanrows.index, inplace=False)
 
 print("Dataset: \n")
-# print(dataset)
+print(S_DS)
 
 # 1880 seconds passed, approx 150 samples per second per device.
 print(len(dataset["Realtime"].unique()))
@@ -65,19 +73,19 @@ for i in range(len(devices)):
 
 """ ## Gravity removal. """
 # Remove gravity to complete dataset.
-x_nograv, y_nograv, z_nograv = remove_gravity(dataset_sampled)
-dataset_sampled["x_nograv"] = x_nograv
-dataset_sampled["y_nograv"] = y_nograv
-dataset_sampled["z_nograv"] = z_nograv
+x_nograv, y_nograv, z_nograv = remove_gravity(S_DS)
+S_DS["x_nograv"] = x_nograv
+S_DS["y_nograv"] = y_nograv
+S_DS["z_nograv"] = z_nograv
 
 """ Plot difference with and without gravity """
 # fig_1, axs_1 = plt.subplots(2,3, figsize=(25,10))
-# axs_1[0,0].plot(dataset_sampled["realtime"], dataset_sampled["x"])
-# axs_1[0,1].plot(dataset_sampled["realtime"], dataset_sampled["y"])
-# axs_1[0,2].plot(dataset_sampled["realtime"], dataset_sampled["z"])
-# axs_1[1,0].plot(dataset_sampled["realtime"], dataset_sampled["x_nograv"])
-# axs_1[1,1].plot(dataset_sampled["realtime"], dataset_sampled["y_nograv"])
-# axs_1[1,2].plot(dataset_sampled["realtime"], dataset_sampled["z_nograv"])
+# axs_1[0,0].plot(S_DS["realtime"], S_DS["x"])
+# axs_1[0,1].plot(S_DS["realtime"], S_DS["y"])
+# axs_1[0,2].plot(S_DS["realtime"], S_DS["z"])
+# axs_1[1,0].plot(S_DS["realtime"], S_DS["x_nograv"])
+# axs_1[1,1].plot(S_DS["realtime"], S_DS["y_nograv"])
+# axs_1[1,2].plot(S_DS["realtime"], S_DS["z_nograv"])
 
 # """## Segmentation."""
 # 
@@ -88,9 +96,8 @@ sampling_freq = 200 # 200 samples per second.
 window_size = 5 # 5 Seconds
 segment_size = sampling_freq * window_size
 
-segments = segment_data(segment_size, dataset_sampled)
+segments = segment_data(segment_size, S_DS)
 print("Segments: ", len(segments))
-
 
 """## Features Extraction.
 
@@ -101,7 +108,10 @@ for k in segments:
   seg = segments[k]['data']
   seg["mag"] = get_magnitudes(seg, nograv=True)
 
-print(segments[0])
+segments_df = pd.DataFrame(segments).transpose()
+for i in range(len(segments_df)):
+    if(len(segments_df["class"].iloc[i]) > 1):
+        print(segments_df["class"].iloc[i]) # Segment with more than 1 class.
 
 """### Features"""
 
@@ -111,7 +121,7 @@ for k in segments:
   features[k] = get_features(segments[k]['data'])
 
 fts = pd.DataFrame(features).transpose()
-print(fts)
+# print(fts)
 
 # Each five seconds the predicted clas should be updated?
 # or that predicted class must be updated each time data from the
