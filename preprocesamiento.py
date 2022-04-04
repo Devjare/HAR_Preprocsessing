@@ -119,7 +119,7 @@ for k in segments:
   features[k] = get_features(segments[k]['data'])
 
 fts = pd.DataFrame(features).transpose()
-# print(fts)
+print(fts)
 
 # Each five seconds the predicted clas should be updated?
 # or that predicted class must be updated each time data from the

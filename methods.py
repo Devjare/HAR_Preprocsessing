@@ -13,11 +13,9 @@ def remove_gravity(data):
   accNoGravity = [[], [], []]
 
   for idx in data["Idx"]:
-    # print("Data[Index]: \n", data["Index"])
-    # print("idx: ", idx)
-    x = data[data["Index"] == idx]['x'][idx]
-    y = data[data["Index"] == idx]['y'][idx]
-    z = data[data["Index"] == idx]['z'][idx]
+    x = data['x'][idx]
+    y = data['y'][idx]
+    z = data['z'][idx]
 
     gravity[0] = alpha * gravity[0] + (1 - alpha) * x
     gravity[1] = alpha * gravity[1] + (1 - alpha) * y
@@ -49,7 +47,7 @@ def segment_data(segment_size, data):
             'init': segment_init,
             'size': len(segment),
             'data': segment,
-            'class': segment["gt"].unique()
+            'class': most_freq_class
         }
 
     # Preprocess segment(Extract features)
